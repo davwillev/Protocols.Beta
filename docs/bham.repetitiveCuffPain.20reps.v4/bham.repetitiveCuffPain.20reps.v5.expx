@@ -31,17 +31,17 @@
                     delta-pressure="CONFIGURATION.Rate"
                     measurement="pdt"
                     pressure-limit="100"
-                    primary-cuff="1"
+                    primary-cuff="1 if CONFIGURATION.Cuff else 2"
                     second-cuff="false">   
                     <properties>
                         <!-- Wait the time interval (s) set in CONFIGURATIONS from the end (button press) of prior repetition -->
-                        <time-constraint procedure-id="var: '' if m == '1' else 'CH1M{0}'.format(int(m) - 1)" 
+                        <time-constraint procedure-id="var: '' if m == '1' else 'S1M{0}'.format(int(m) - 1)" 
                         time-reference="end"
                         min="10 if 'TEST' in Participant else CONFIGURATION.Tisi"/>
                     </properties>
                     <dependencies>
                         <dependency id="CONFIGURATION" virtual="false" />
-                        <dependency id="var: '' if m == '1' else 'CH1M{0}'.format(int(m) - 1)" virtual="true" />
+                        <dependency id="var: '' if m == '1' else 'S1M{0}'.format(int(m) - 1)" virtual="true" />
                     </dependencies>                                     
                 </algometry-stimulus-rating>
 
@@ -49,16 +49,16 @@
                     delta-pressure="CONFIGURATION.Rate"
                     measurement="pdt"
                     pressure-limit="100"
-                    primary-cuff="2"
+                    primary-cuff="2 if CONFIGURATION.Cuff else 1"
                     second-cuff="false">                    
                     <properties>
-                        <time-constraint procedure-id="CH1M20" 
+                        <time-constraint procedure-id="S1M20" 
                             time-reference="end"
                             min="10 if 'TEST' in Participant else CONFIGURATION.Tside"/>
                     </properties>
                     <dependencies>
                         <dependency id="CONFIGURATION" virtual="false" />
-                        <dependency id="CH1M20" virtual="true" />
+                        <dependency id="S1M20" virtual="true" />
                     </dependencies>                 
                 </algometry-stimulus-rating>
 
@@ -66,23 +66,23 @@
                     delta-pressure="CONFIGURATION.Rate"
                     measurement="pdt"
                     pressure-limit="100"
-                    primary-cuff="2"
+                    primary-cuff="2 if CONFIGURATION.Cuff else 1"
                     second-cuff="false">                    
                     <properties>
-                        <time-constraint procedure-id="var: '' if m == '1' else 'CH2M{0}'.format(int(m) - 1)" 
+                        <time-constraint procedure-id="var: '' if m == '1' else 'S2M{0}'.format(int(m) - 1)" 
                         time-reference="end"
                         min="10 if 'TEST' in Participant else CONFIGURATION.Tisi"/>
                     </properties>
                     <dependencies>
                         <dependency id="CONFIGURATION" virtual="false" />
-                        <dependency id="var: '' if m == '1' else 'CH2M{0}'.format(int(m) - 1)" virtual="true" />
+                        <dependency id="var: '' if m == '1' else 'S2M{0}'.format(int(m) - 1)" virtual="true" />
                     </dependencies>                 
                 </algometry-stimulus-rating>
             </procedure-templates>
         </templates>
         <procedures>
             <questionnaire id="CONFIGURATION" 
-                name="LeftCuff">
+                name="Protocol setup">
                 <content>
                     <boolean id="Cuff"
                         true-label="Left" 
@@ -158,20 +158,20 @@
             </questionnaire>
 
             <foreach variable="m" in="Measurements">
-                <algometry-stimulus-rating-constructor id="var: 'CH1M{0}'.format(m)" 
-                    name="var: 'Cuff Pressure Pain Threshold (Channel 1, M{0})'.format(m)" 
+                <algometry-stimulus-rating-constructor id="var: 'S1M{0}'.format(m)" 
+                    name="var: 'Cuff Pressure Pain Threshold (Side 1, M{0})'.format(m)" 
                     template="CPPT01" />
             </foreach>
 
             <foreach variable="m" in="Measurements">
                 <if condition="m == '1'">
-                    <algometry-stimulus-rating-constructor id="var: 'CH2M{0}'.format(m)" 
-                        name="var: 'Cuff Pressure Pain Threshold (Channel 2, M{0})'.format(m)" 
+                    <algometry-stimulus-rating-constructor id="var: 'S2M{0}'.format(m)" 
+                        name="var: 'Cuff Pressure Pain Threshold (Side 2, M{0})'.format(m)" 
                         template="CPPT02INITIAL" />
                 </if>
                 <if condition="m != '1'">
-                    <algometry-stimulus-rating-constructor id="var: 'CH2M{0}'.format(m)" 
-                        name="var: 'Cuff Pressure Pain Threshold (Channel 2, M{0})'.format(m)" 
+                    <algometry-stimulus-rating-constructor id="var: 'S2M{0}'.format(m)" 
+                        name="var: 'Cuff Pressure Pain Threshold (Side 2, M{0})'.format(m)" 
                         template="CPPT02" />
                 </if>
 
@@ -201,50 +201,50 @@
             location="C:\LabBenchData\repetitiveCuffPain"
             filename="dynamic: '{s}.csv'.format(s = Participant)">
             <item name="ID" value="Participant" default="NA"/>
-            <item name="LeftCuff" value="CONFIGURATION.Cuff" default="NA"/>
+            <item name="FirstArm" value="'Left' if CONFIGURATION.Cuff else 'Right'" default="NA"/>
             <item name="Rate_kPa_s" value="CONFIGURATION.Rate"  default="NA"/>
             <item name="ISI_s" value="CONFIGURATION.Tisi"  default="NA"/>
             <item name="SideInterval_s" value="CONFIGURATION.Tside" default="NA"/>
-            <item name="CH1M1"  value="'{:.1f}'.format(CH1M1.PDT)" default="NA"/>
-            <item name="CH1M2"  value="'{:.1f}'.format(CH1M2.PDT)" default="NA"/>
-            <item name="CH1M3"  value="'{:.1f}'.format(CH1M3.PDT)" default="NA"/>
-            <item name="CH1M4"  value="'{:.1f}'.format(CH1M4.PDT)" default="NA"/>
-            <item name="CH1M5"  value="'{:.1f}'.format(CH1M5.PDT)" default="NA"/>
-            <item name="CH1M6"  value="'{:.1f}'.format(CH1M6.PDT)" default="NA"/>
-            <item name="CH1M7"  value="'{:.1f}'.format(CH1M7.PDT)" default="NA"/>
-            <item name="CH1M8"  value="'{:.1f}'.format(CH1M8.PDT)" default="NA"/>
-            <item name="CH1M9"  value="'{:.1f}'.format(CH1M9.PDT)" default="NA"/>
-            <item name="CH1M10" value="'{:.1f}'.format(CH1M10.PDT)" default="NA"/>
-            <item name="CH1M11" value="'{:.1f}'.format(CH1M11.PDT)" default="NA"/>
-            <item name="CH1M12" value="'{:.1f}'.format(CH1M12.PDT)" default="NA"/>
-            <item name="CH1M13" value="'{:.1f}'.format(CH1M13.PDT)" default="NA"/>
-            <item name="CH1M14" value="'{:.1f}'.format(CH1M14.PDT)" default="NA"/>
-            <item name="CH1M15" value="'{:.1f}'.format(CH1M15.PDT)" default="NA"/>
-            <item name="CH1M16" value="'{:.1f}'.format(CH1M16.PDT)" default="NA"/>
-            <item name="CH1M17" value="'{:.1f}'.format(CH1M17.PDT)" default="NA"/>
-            <item name="CH1M18" value="'{:.1f}'.format(CH1M18.PDT)" default="NA"/>
-            <item name="CH1M19" value="'{:.1f}'.format(CH1M19.PDT)" default="NA"/>
-            <item name="CH1M20" value="'{:.1f}'.format(CH1M20.PDT)" default="NA"/>
-            <item name="CH2M1"  value="'{:.1f}'.format(CH2M1.PDT)" default="NA"/>
-            <item name="CH2M2"  value="'{:.1f}'.format(CH2M2.PDT)" default="NA"/>
-            <item name="CH2M3"  value="'{:.1f}'.format(CH2M3.PDT)" default="NA"/>
-            <item name="CH2M4"  value="'{:.1f}'.format(CH2M4.PDT)" default="NA"/>
-            <item name="CH2M5"  value="'{:.1f}'.format(CH2M5.PDT)" default="NA"/>
-            <item name="CH2M6"  value="'{:.1f}'.format(CH2M6.PDT)" default="NA"/>
-            <item name="CH2M7"  value="'{:.1f}'.format(CH2M7.PDT)" default="NA"/>
-            <item name="CH2M8"  value="'{:.1f}'.format(CH2M8.PDT)" default="NA"/>
-            <item name="CH2M9"  value="'{:.1f}'.format(CH2M9.PDT)" default="NA"/>
-            <item name="CH2M10" value="'{:.1f}'.format(CH2M10.PDT)" default="NA"/>
-            <item name="CH2M11" value="'{:.1f}'.format(CH2M11.PDT)" default="NA"/>
-            <item name="CH2M12" value="'{:.1f}'.format(CH2M12.PDT)" default="NA"/>
-            <item name="CH2M13" value="'{:.1f}'.format(CH2M13.PDT)" default="NA"/>
-            <item name="CH2M14" value="'{:.1f}'.format(CH2M14.PDT)" default="NA"/>
-            <item name="CH2M15" value="'{:.1f}'.format(CH2M15.PDT)" default="NA"/>
-            <item name="CH2M16" value="'{:.1f}'.format(CH2M16.PDT)" default="NA"/>
-            <item name="CH2M17" value="'{:.1f}'.format(CH2M17.PDT)" default="NA"/>
-            <item name="CH2M18" value="'{:.1f}'.format(CH2M18.PDT)" default="NA"/>
-            <item name="CH2M19" value="'{:.1f}'.format(CH2M19.PDT)" default="NA"/>
-            <item name="CH2M20" value="'{:.1f}'.format(CH2M20.PDT)" default="NA"/>
+            <item name="S1M1"  value="'{:.1f}'.format(S1M1.PDT)" default="NA"/>
+            <item name="S1M2"  value="'{:.1f}'.format(S1M2.PDT)" default="NA"/>
+            <item name="S1M3"  value="'{:.1f}'.format(S1M3.PDT)" default="NA"/>
+            <item name="S1M4"  value="'{:.1f}'.format(S1M4.PDT)" default="NA"/>
+            <item name="S1M5"  value="'{:.1f}'.format(S1M5.PDT)" default="NA"/>
+            <item name="S1M6"  value="'{:.1f}'.format(S1M6.PDT)" default="NA"/>
+            <item name="S1M7"  value="'{:.1f}'.format(S1M7.PDT)" default="NA"/>
+            <item name="S1M8"  value="'{:.1f}'.format(S1M8.PDT)" default="NA"/>
+            <item name="S1M9"  value="'{:.1f}'.format(S1M9.PDT)" default="NA"/>
+            <item name="S1M10" value="'{:.1f}'.format(S1M10.PDT)" default="NA"/>
+            <item name="S1M11" value="'{:.1f}'.format(S1M11.PDT)" default="NA"/>
+            <item name="S1M12" value="'{:.1f}'.format(S1M12.PDT)" default="NA"/>
+            <item name="S1M13" value="'{:.1f}'.format(S1M13.PDT)" default="NA"/>
+            <item name="S1M14" value="'{:.1f}'.format(S1M14.PDT)" default="NA"/>
+            <item name="S1M15" value="'{:.1f}'.format(S1M15.PDT)" default="NA"/>
+            <item name="S1M16" value="'{:.1f}'.format(S1M16.PDT)" default="NA"/>
+            <item name="S1M17" value="'{:.1f}'.format(S1M17.PDT)" default="NA"/>
+            <item name="S1M18" value="'{:.1f}'.format(S1M18.PDT)" default="NA"/>
+            <item name="S1M19" value="'{:.1f}'.format(S1M19.PDT)" default="NA"/>
+            <item name="S1M20" value="'{:.1f}'.format(S1M20.PDT)" default="NA"/>
+            <item name="S2M1"  value="'{:.1f}'.format(S2M1.PDT)" default="NA"/>
+            <item name="S2M2"  value="'{:.1f}'.format(S2M2.PDT)" default="NA"/>
+            <item name="S2M3"  value="'{:.1f}'.format(S2M3.PDT)" default="NA"/>
+            <item name="S2M4"  value="'{:.1f}'.format(S2M4.PDT)" default="NA"/>
+            <item name="S2M5"  value="'{:.1f}'.format(S2M5.PDT)" default="NA"/>
+            <item name="S2M6"  value="'{:.1f}'.format(S2M6.PDT)" default="NA"/>
+            <item name="S2M7"  value="'{:.1f}'.format(S2M7.PDT)" default="NA"/>
+            <item name="S2M8"  value="'{:.1f}'.format(S2M8.PDT)" default="NA"/>
+            <item name="S2M9"  value="'{:.1f}'.format(S2M9.PDT)" default="NA"/>
+            <item name="S2M10" value="'{:.1f}'.format(S2M10.PDT)" default="NA"/>
+            <item name="S2M11" value="'{:.1f}'.format(S2M11.PDT)" default="NA"/>
+            <item name="S2M12" value="'{:.1f}'.format(S2M12.PDT)" default="NA"/>
+            <item name="S2M13" value="'{:.1f}'.format(S2M13.PDT)" default="NA"/>
+            <item name="S2M14" value="'{:.1f}'.format(S2M14.PDT)" default="NA"/>
+            <item name="S2M15" value="'{:.1f}'.format(S2M15.PDT)" default="NA"/>
+            <item name="S2M16" value="'{:.1f}'.format(S2M16.PDT)" default="NA"/>
+            <item name="S2M17" value="'{:.1f}'.format(S2M17.PDT)" default="NA"/>
+            <item name="S2M18" value="'{:.1f}'.format(S2M18.PDT)" default="NA"/>
+            <item name="S2M19" value="'{:.1f}'.format(S2M19.PDT)" default="NA"/>
+            <item name="S2M20" value="'{:.1f}'.format(S2M20.PDT)" default="NA"/>
         </export-to-csv>       
     </post-actions>
 </experiment>
