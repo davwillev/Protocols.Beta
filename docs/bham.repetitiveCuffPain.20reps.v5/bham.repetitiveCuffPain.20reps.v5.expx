@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<experiment xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="https://files.labbench.io/xsd/6.0/experiment.xsd">
+  <participant-validator regex="^[0-9]+$|^PILOT[0-9]{3}$|^TEST[0-9]{3}$"
+                     advice="Please enter an ID in the form of a number, or in the form TESTXXX / PILOTXXX where X is a three-digit number" />
+  <experimental-setup-variants default="cparplus">
+    <experimental-setup id="cpar" name="Nocitech CPAR">
+        <devices>
+            <cpar id="cpar" compressor-mode="auto"/>
+        </devices>
+        <device-mapping>
+            <device-assignment device-id="cpar" instrument-name="PressureAlgometer" />
+        </device-mapping>
+    </experimental-setup>
+    <experimental-setup id="cparplus" name="LabBench CPAR+">
+        <devices>
+            <cpar-plus id="cpar" />
+        </devices>
+        <device-mapping>
+            <device-assignment device-id="cpar" instrument-name="PressureAlgometer" />
+        </device-mapping>
+    </experimental-setup>
+  </experimental-setup-variants>  
+    <protocol>
+        <templates>
+            <template-variables>
+                <strings name="Measurements" value="1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20" />
+            </template-variables>
+            <procedure-templates>
+                <algometry-stimulus-rating id="CPPT01"
+                    delta-pressure="CONFIGURATION.Rate"
+                    measurement="pdt"
+                    pressure-limit="100"
+                    primary-cuff="1 if CONFIGURATION.Cuff else 2"
+                    second-cuff="false">   
+                    <properties>
+                        <!-- Wait the time interval (s) set in CONFIGURATIONS from the end (button press) of prior repetition -->
+                        <time-constraint procedure-id="var: '' if m == '1' else 'S1M{0}'.format(int(m) - 1)" 
+                        time-reference="end"
+                        min="10 if 'TEST' in Participant else CONFIGURATION.Tisi"/>
+                    </properties>
+                    <dependencies>
+                        <dependency id="CONFIGURATION" virtual="false" />
+                        <dependency id="var: '' if m == '1' else 'S1M{0}'.format(int(m) - 1)" virtual="true" />
+                    </dependencies>                                     
+                </algometry-stimulus-rating>
+
+                <algometry-stimulus-rating id="CPPT02INITIAL"
+                    delta-pressure="CONFIGURATION.Rate"
+                    measurement="pdt"
+                    pressure-limit="100"
+                    primary-cuff="2 if CONFIGURATION.Cuff else 1"
+                    second-cuff="false">                    
+                    <properties>
+                        <time-constraint procedure-id="S1M20" 
+                            time-reference="end"
+                            min="10 if 'TEST' in Participant else CONFIGURATION.Tside"/>
+                    </properties>
+                    <dependencies>
+                        <dependency id="CONFIGURATION" virtual="false" />
+                        <dependency id="S1M20" virtual="true" />
+                    </dependencies>                 
+                </algometry-stimulus-rating>
+
+                <algometry-stimulus-rating id="CPPT02"
+                    delta-pressure="CONFIGURATION.Rate"
+                    measurement="pdt"
+                    pressure-limit="100"
+                    primary-cuff="2 if CONFIGURATION.Cuff else 1"
+                    second-cuff="false">                    
+                    <properties>
+                        <time-constraint procedure-id="var: '' if m == '1' else 'S2M{0}'.format(int(m) - 1)" 
+                        time-reference="end"
+                        min="10 if 'TEST' in Participant else CONFIGURATION.Tisi"/>
+                    </properties>
+                    <dependencies>
+                        <dependency id="CONFIGURATION" virtual="false" />
+                        <dependency id="var: '' if m == '1' else 'S2M{0}'.format(int(m) - 1)" virtual="true" />
+                    </dependencies>                 
+                </algometry-stimulus-rating>
+            </procedure-templates>
+        </templates>
+        <procedures>
+            <questionnaire id="CONFIGURATION" 
+                name="Protocol setup">
+                <content>
+                    <boolean id="Cuff"
+                        true-label="Left" 
+                        false-label="Right" 
+                        title="Starting cuff" 
+                        instruction="Enter the initial (first) arm to be tested:" />
+                    <likert id="Rate"
+                        title="Rate of pressure increase"
+                        instruction="Please select the rate of pressure increase:">
+                        <choice value="1" label="1 kPa/s" />
+                        <choice value="2" label="2 kPa/s" />
+                        <choice value="3" label="3 kPa/s" />
+                        <choice value="4" label="4 kPa/s" />
+                        <choice value="5" label="5 kPa/s" />
+                        <choice value="6" label="6 kPa/s" />
+                        <choice value="7" label="7 kPa/s" />
+                        <choice value="8" label="8 kPa/s" />
+                        <choice value="9" label="9 kPa/s" />
+                        <choice value="10" label="10 kPa/s" />
+                    </likert>
+                    <likert id="Tisi"
+                        title="Inter-stimulus-interval"
+                        instruction="Please select the time interval between measurements (stimuli):">
+                        <choice value="0" label="None" />
+                        <choice value="5" label="5 s" />
+                        <choice value="10" label="10 s" />
+                        <choice value="15" label="15 s" />
+                        <choice value="20" label="20 s" />
+                        <choice value="25" label="25 s" />
+                        <choice value="30" label="30 s" />
+                        <choice value="35" label="35 s" />
+                        <choice value="40" label="40 s" />
+                        <choice value="45" label="45 s" />
+                        <choice value="50" label="50 s" />
+                        <choice value="55" label="55 s" />
+                        <choice value="60" label="60 s" />
+                    </likert>
+                    <likert id="Tside"
+                        title="Time between sides"
+                        instruction="Please select the period of time between testing the first and second arm:">
+                        <choice value="0"  label="None" />
+                        <choice value="60"  label="1 min" />
+                        <choice value="120" label="2 mins" />
+                        <choice value="180" label="3 mins" />
+                        <choice value="240" label="4 mins" />
+                        <choice value="300" label="5 mins" />
+                        <choice value="360" label="6 mins" />
+                        <choice value="420" label="7 mins" />
+                        <choice value="480" label="8 mins" />
+                        <choice value="540" label="9 mins" />
+                        <choice value="600" label="10 mins" />
+                    </likert>            
+                </content>
+            </questionnaire>
+
+            <questionnaire id="SETUP" 
+                name="Configuration">
+                <properties>
+                    <instructions blocked="Assets.Instructions.Default"
+                                  ready="func: Script.GetInstructions(tc)" 
+                                  completed="func: Script.GetInstructions(tc)" />
+                </properties>
+                <dependencies>
+                    <dependency id="CONFIGURATION" />
+                </dependencies>
+                <content>
+                    <boolean id="Setup"
+                        true-label="Yes" 
+                        false-label="No" 
+                        title="Connecting cuffs" 
+                        instruction="Have you setup the cuffs according to the instructions?" />                   
+                </content>
+            </questionnaire>
+
+            <foreach variable="m" in="Measurements">
+                <algometry-stimulus-rating-constructor id="var: 'S1M{0}'.format(m)" 
+                    name="var: 'Cuff Pressure Pain Threshold (Side 1, M{0})'.format(m)" 
+                    template="CPPT01" />
+            </foreach>
+
+            <foreach variable="m" in="Measurements">
+                <if condition="m == '1'">
+                    <algometry-stimulus-rating-constructor id="var: 'S2M{0}'.format(m)" 
+                        name="var: 'Cuff Pressure Pain Threshold (Side 2, M{0})'.format(m)" 
+                        template="CPPT02INITIAL" />
+                </if>
+                <if condition="m != '1'">
+                    <algometry-stimulus-rating-constructor id="var: 'S2M{0}'.format(m)" 
+                        name="var: 'Cuff Pressure Pain Threshold (Side 2, M{0})'.format(m)" 
+                        template="CPPT02" />
+                </if>
+
+            </foreach>
+        </procedures>
+        <assets>
+            <file-asset id="Instructions" file="Instructions.zip" />
+            <file-asset file="Script.py" />
+        </assets>
+    </protocol>    
+    <post-actions>    
+        <export-log name="Export Session Log"
+            level="information"
+            location="C:\LabBenchData\repetitiveCuffPain"
+            id="Repetitive Cuff Pain, Version 1"
+            filename="dynamic: '{s} Session Log.pdf'.format(s = Participant)"/>       
+
+        <export-data name="Export Raw Data"
+            format="json"
+            location="C:\LabBenchData\repetitiveCuffPain"
+            filename="dynamic: '{s}.json'.format(s = Participant)"/>
+
+        <export-to-csv name="Export to CSV"
+            culture="en-GB"
+            header="true"
+            separator=";"
+            location="C:\LabBenchData\repetitiveCuffPain"
+            filename="dynamic: '{s}.csv'.format(s = Participant)">
+            <item name="ID" value="Participant" default="NA"/>
+            <item name="FirstArm" value="'Left' if CONFIGURATION.Cuff else 'Right'" default="NA"/>
+            <item name="Rate_kPa_s" value="CONFIGURATION.Rate"  default="NA"/>
+            <item name="ISI_s" value="CONFIGURATION.Tisi"  default="NA"/>
+            <item name="SideInterval_s" value="CONFIGURATION.Tside" default="NA"/>
+            <item name="S1M1"  value="'{:.1f}'.format(S1M1.PDT)" default="NA"/>
+            <item name="S1M2"  value="'{:.1f}'.format(S1M2.PDT)" default="NA"/>
+            <item name="S1M3"  value="'{:.1f}'.format(S1M3.PDT)" default="NA"/>
+            <item name="S1M4"  value="'{:.1f}'.format(S1M4.PDT)" default="NA"/>
+            <item name="S1M5"  value="'{:.1f}'.format(S1M5.PDT)" default="NA"/>
+            <item name="S1M6"  value="'{:.1f}'.format(S1M6.PDT)" default="NA"/>
+            <item name="S1M7"  value="'{:.1f}'.format(S1M7.PDT)" default="NA"/>
+            <item name="S1M8"  value="'{:.1f}'.format(S1M8.PDT)" default="NA"/>
+            <item name="S1M9"  value="'{:.1f}'.format(S1M9.PDT)" default="NA"/>
+            <item name="S1M10" value="'{:.1f}'.format(S1M10.PDT)" default="NA"/>
+            <item name="S1M11" value="'{:.1f}'.format(S1M11.PDT)" default="NA"/>
+            <item name="S1M12" value="'{:.1f}'.format(S1M12.PDT)" default="NA"/>
+            <item name="S1M13" value="'{:.1f}'.format(S1M13.PDT)" default="NA"/>
+            <item name="S1M14" value="'{:.1f}'.format(S1M14.PDT)" default="NA"/>
+            <item name="S1M15" value="'{:.1f}'.format(S1M15.PDT)" default="NA"/>
+            <item name="S1M16" value="'{:.1f}'.format(S1M16.PDT)" default="NA"/>
+            <item name="S1M17" value="'{:.1f}'.format(S1M17.PDT)" default="NA"/>
+            <item name="S1M18" value="'{:.1f}'.format(S1M18.PDT)" default="NA"/>
+            <item name="S1M19" value="'{:.1f}'.format(S1M19.PDT)" default="NA"/>
+            <item name="S1M20" value="'{:.1f}'.format(S1M20.PDT)" default="NA"/>
+            <item name="S2M1"  value="'{:.1f}'.format(S2M1.PDT)" default="NA"/>
+            <item name="S2M2"  value="'{:.1f}'.format(S2M2.PDT)" default="NA"/>
+            <item name="S2M3"  value="'{:.1f}'.format(S2M3.PDT)" default="NA"/>
+            <item name="S2M4"  value="'{:.1f}'.format(S2M4.PDT)" default="NA"/>
+            <item name="S2M5"  value="'{:.1f}'.format(S2M5.PDT)" default="NA"/>
+            <item name="S2M6"  value="'{:.1f}'.format(S2M6.PDT)" default="NA"/>
+            <item name="S2M7"  value="'{:.1f}'.format(S2M7.PDT)" default="NA"/>
+            <item name="S2M8"  value="'{:.1f}'.format(S2M8.PDT)" default="NA"/>
+            <item name="S2M9"  value="'{:.1f}'.format(S2M9.PDT)" default="NA"/>
+            <item name="S2M10" value="'{:.1f}'.format(S2M10.PDT)" default="NA"/>
+            <item name="S2M11" value="'{:.1f}'.format(S2M11.PDT)" default="NA"/>
+            <item name="S2M12" value="'{:.1f}'.format(S2M12.PDT)" default="NA"/>
+            <item name="S2M13" value="'{:.1f}'.format(S2M13.PDT)" default="NA"/>
+            <item name="S2M14" value="'{:.1f}'.format(S2M14.PDT)" default="NA"/>
+            <item name="S2M15" value="'{:.1f}'.format(S2M15.PDT)" default="NA"/>
+            <item name="S2M16" value="'{:.1f}'.format(S2M16.PDT)" default="NA"/>
+            <item name="S2M17" value="'{:.1f}'.format(S2M17.PDT)" default="NA"/>
+            <item name="S2M18" value="'{:.1f}'.format(S2M18.PDT)" default="NA"/>
+            <item name="S2M19" value="'{:.1f}'.format(S2M19.PDT)" default="NA"/>
+            <item name="S2M20" value="'{:.1f}'.format(S2M20.PDT)" default="NA"/>
+        </export-to-csv>       
+    </post-actions>
+</experiment>
